@@ -1,0 +1,25 @@
+name: Build APK
+on:
+  workflow_dispatch:
+  push:
+    branches: [main, master]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+      - name: Unzip project
+        run: unzip -q am-sms-forwarder-android-project.zip -d src
+      - name: Build debug APK
+        working-directory: src
+        run: |
+          chmod +x ./gradlew
+          ./gradlew --no-daemon assembleDebug
+      - uses: actions/upload-artifact@v4
+        with:
+          name: am-sms-forwarder-apk
+          path: src/app/build/outputs/apk/debug/app-debug.apk
